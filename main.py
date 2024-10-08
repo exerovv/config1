@@ -30,6 +30,7 @@ def run_shell(username):
 def parse_args():
     parser = argparse.ArgumentParser(description="Shell Emulator")
     parser.add_argument('--user', required=True, help='Имя пользователя для приглашения')
+    parser.add_argument('--tar', required=True, help='Путь к tar-файлу с виртуальной файловой системой')
     return parser.parse_args()
 
 def main():
