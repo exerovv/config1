@@ -7,7 +7,7 @@ def prompt(username, current_path):
     if current_path == home_path:
         path_display = "~"
     else:
-        path_display = current_path
+        path_display = current_path.lstrip('/')
     return f"{username}@emulator:{path_display}$ "
 
 
@@ -56,15 +56,17 @@ def list_directory(current_path, tar_files):
 def change_directory(current_path, target_directory, tar_file):
     if target_directory == "/":
         return "/root"
-
     elif target_directory == "..":
         if current_path != "/root":
-            return os.path.dirname(current_path)
-        return current_path
+            return current_path
+        parent_path = os.path.dirname(current_path.strip('/'))
+        if parent_path == "":
+            return "/root"
+        return "/" + parent_path
     else:
         new_path = os.path.join(current_path, target_directory).replace("\\", "/").strip('/')
         if any(f.startswith(new_path + '/') for f in tar_file.getnames()):
-            return new_path
+            return "/" + new_path if not new_path.startswith("/") else new_path
         else:
             print(f"cd: {target_directory}: No such file or directory")
             return current_path
