@@ -1,6 +1,8 @@
 import argparse
 import tarfile
 import os
+from collections import deque
+
 
 def prompt(username, current_path):
     home_path = "/root"
@@ -36,6 +38,11 @@ def run_shell(username, tar):
                         print("cd: missing argument")
                 elif cmd == 'tree':
                     tree(current_path, tar_file.getnames())
+                elif cmd == 'tail':
+                    if len(command) > 1:
+                        tail(tar_file, command[1])
+                    else:
+                        print("tail: missing argument")
                 else:
                     print(f"{cmd}: command not found")
             except KeyboardInterrupt:
@@ -49,11 +56,13 @@ def parse_args():
     return parser.parse_args()
 
 def list_directory(current_path, tar_file):
+    current_path = current_path.strip('/')
+    current_path_len = len(current_path)
     for file in tar_file.getnames():
-        relative_path = file[len(current_path):].lstrip('/')
-        if '/' not in relative_path and relative_path:
-            print(relative_path)
-
+        if file.startswith(current_path):
+            relative_path = file[current_path_len:].lstrip('/')
+            if relative_path and '/' not in relative_path:
+                print(relative_path)
 
 def change_directory(current_path, target_directory, tar_file):
     if target_directory == "/":
@@ -94,6 +103,29 @@ def tree(current_path, tar_files, indent=0):
     for sub_dir, files in sub_dirs.items():
         print(f"{prefix}{sub_dir}/")
         tree(f"{current_path}/{sub_dir}".rstrip('/'), files, indent + 4)
+
+
+def tail(tar_file, file_name, n=10):
+    matching_files = [name for name in tar_file.getnames() if name.endswith(f"/{file_name}") or name == file_name]
+
+    if not matching_files:
+        print(f"Файл {file_name} не найден в архиве.")
+        return
+
+    if len(matching_files) > 1:
+        print("Найдено несколько файлов с именем", file_name)
+        for i, file in enumerate(matching_files, 1):
+            print(f"{i}. {file}")
+        choice = int(input("Выберите номер файла: ")) - 1
+        selected_file = matching_files[choice]
+    else:
+        selected_file = matching_files[0]
+
+    with tar_file.extractfile(selected_file) as file:
+        lines = deque(file, maxlen=n)
+
+    for line in lines:
+        print(line.decode('utf-8'), end='')
 
 def main():
     args = parse_args()
