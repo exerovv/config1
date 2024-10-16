@@ -3,7 +3,6 @@ import io
 from contextlib import redirect_stdout
 import unittest
 from main import *
-from unittest.mock import patch, MagicMock
 
 class TestShellCommands(unittest.TestCase):
 
