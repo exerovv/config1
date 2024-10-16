@@ -1,7 +1,7 @@
 import argparse
 import tarfile
-import os
 from collections import deque
+import os
 
 def prompt(username, current_path):
     home_path = "/root"
@@ -59,10 +59,6 @@ def list_directory(current_path, tar_file):
             if relative_path and '/' not in relative_path:
                 print(relative_path)
 
-
-import os
-
-
 def change_directory(current_path, target_directory, tar_file):
     if target_directory == "/":
         return "/root"
@@ -89,6 +85,8 @@ def change_directory(current_path, target_directory, tar_file):
         return current_path
 
 def tree(current_path, tar_files, indent=0):
+    if not any(file.startswith(current_path.lstrip("/")) for file in tar_files):
+        return
     prefix = " " * indent
     sub_dirs = {}
     for file in tar_files:
@@ -119,7 +117,7 @@ def tail(tar_file, file_name, n=10):
         selected_file = matching_files[choice]
     else:
         selected_file = matching_files[0]
-    with tar_file.extractfile(selected_file) as file:
+    with tar_file.extractfile(selected_file) as file:\
         lines = deque(file, maxlen=n)
     for line in lines:
         print(line.decode('utf-8'), end='')
