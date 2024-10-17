@@ -46,7 +46,7 @@ def run_shell(username, tar):
                         line_count = int(command[2])
                         tail(tar_file, command[1], line_count)
                     except ValueError:
-                        print(f"tail: '{command[2]}' not a digit")
+                        print("tail: invalid input")
                 else:
                     print(f"{cmd}: command not found")
 

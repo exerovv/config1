@@ -82,7 +82,7 @@ class TestShellCommands(unittest.TestCase):
         with io.StringIO() as buf, redirect_stdout(buf):
             tail(self.tar, 'nonexistent.txt', n=2)
             output = buf.getvalue().strip()
-        self.assertIn('Файл nonexistent.txt не найден в архиве', output)
+        self.assertIn('File nonexistent.txt not found in archive.', output)
 
     def test_tail_less_than_n_lines(self):
         with io.StringIO() as buf, redirect_stdout(buf):
